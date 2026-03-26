@@ -1,15 +1,13 @@
 {
-  "model": "LogisticRegression",
-  "vectorizer": "TF-IDF (10k features, bigrams, sublinear_tf)",
-  "train_samples": 120000,
-  "test_samples": 7600,
-  "accuracy": 0.91,
-  "macro_f1": 0.9099,
-  "per_class_f1": {
-    "World": 0.916,
-    "Sports": 0.9618,
-    "Business": 0.8761,
-    "Sci/Tech": 0.8856
+  "model": "Pipeline(TF-IDF + LogisticRegression)",
+  "best_params": {
+    "classifier__C": 1.0,
+    "tfidf__max_features": 20000
   },
-  "training_time_s": 18.33
+  "cv_f1_macro": 0.9046,
+  "test_f1_macro": 0.9175,
+  "baseline_f1": 0.9099,
+  "improvement": 0.0076,
+  "train_samples": 120000,
+  "test_samples": 7600
 }
