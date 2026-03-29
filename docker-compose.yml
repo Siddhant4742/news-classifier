@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15
+    container_name: news-classifier-db
+    environment:
+      POSTGRES_USER: classifier
+      POSTGRES_PASSWORD: classifier123
+      POSTGRES_DB: news_classifier
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
