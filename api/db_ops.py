@@ -204,3 +204,14 @@ if __name__ == "__main__":
     finally:
         db.close()
         print("\nDone. Database session closed.")
+        
+        
+        
+if __name__ == "__main__":
+    db = SessionLocal()
+    from api.db import get_active_model_version
+    active = get_active_model_version(db)
+    print(f"\nActive model: {active.name} v{active.version}")
+    print(f"Artifact path: {active.artifact_path}")
+    print(f"Metrics: {active.metrics}")
+    db.close()

@@ -9,7 +9,7 @@ from sqlalchemy import (
     Float, DateTime, Boolean, Text, JSON
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker,Session
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -95,6 +95,63 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Add to bottom of api/db.py
+
+def get_active_model_version(db: Session) -> ModelVersion:
+    """
+    Returns the currently active model version from the database.
+    FastAPI will call this on startup to know which model to load.
+    If no active model exists, raises a clear error rather than
+    serving with no model — fail loud, not silent.
+    """
+    from sqlalchemy.orm import Session as SessionType
+
+    model = db.query(ModelVersion).filter(
+        ModelVersion.is_active == True
+    ).first()
+
+    if not model:
+        raise RuntimeError(
+            "No active model version found in database. "
+            "Run db_ops.py to register a model before starting the API."
+        )
+
+    return model
+
+
+def deactivate_all_models(db: Session):
+    """
+    Sets is_active=False on all model versions.
+    Call this before activating a new model version
+    to ensure only one model is active at a time.
+    """
+    db.query(ModelVersion).update({"is_active": False})
+    db.commit()
+    print("All model versions deactivated.")
+
+
+def activate_model(db: Session, model_id: int):
+    """
+    Activates a specific model version by ID.
+    Deactivates all others first — enforces single active model.
+    Use this when deploying a new model version (e.g. DistilBERT on Day 11).
+    """
+    deactivate_all_models(db)
+
+    model = db.query(ModelVersion).filter(
+        ModelVersion.id == model_id
+    ).first()
+
+    if not model:
+        raise ValueError(f"No model version found with id={model_id}")
+
+    model.is_active = True
+    db.commit()
+    db.refresh(model)
+    print(f"Activated: {model.name} v{model.version}")
+    return model
+
 
 
 if __name__ == "__main__":
