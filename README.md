@@ -1,4 +1,4 @@
-# News Classifier - Day 5
+# News Classifier - Day 6
 
 ML-powered news classification API built with FastAPI and PostgreSQL.
 
